@@ -219,8 +219,12 @@ class SandPixel(Pixel):
     color = arcade.csscolor.YELLOW
 
     def update(self) -> None:
-        if not self.is_up():
-            self.move_up()
+        if not self.is_down():
+            self.move_down()
+        elif not self.is_left() and not self.is_down_left():
+            self.move_left()
+        elif not self.is_right() and not self.is_down_right():
+            self.move_right()
 
 
 class MyGame(arcade.Window):
@@ -234,6 +238,7 @@ class MyGame(arcade.Window):
 
         self.pixel_list = None
         self.pixel_array = None
+        self.timer = None
 
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
@@ -243,14 +248,17 @@ class MyGame(arcade.Window):
         rows = int(SCREEN_HEIGHT / PIXEL_SIZE)
         self.pixel_array = PixelArray(cols, rows)
 
-        pixel = SandPixel(self.pixel_array, cols / 2, 0, PIXEL_SIZE)
-        self.pixel_list.append(pixel)
-        pixel = SandPixel(self.pixel_array, cols / 2, 10, PIXEL_SIZE)
-        self.pixel_list.append(pixel)
+        self.timer = 0
 
     def on_update(self, delta_time: float):
         """Movement and game logic"""
         self.pixel_list.update()
+        if self.timer == 20:
+            pixel = SandPixel(self.pixel_array,
+                              self.pixel_array.cols / 2, self.pixel_array.rows - 1, PIXEL_SIZE)
+            self.pixel_list.append(pixel)
+            self.timer = 0
+        self.timer += 1
 
     def on_draw(self):
         """Render the screen."""
