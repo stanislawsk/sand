@@ -5,7 +5,6 @@ from typing import Dict, List
 
 import arcade
 
-# Constants
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 500
 PIXEL_SIZE = 5
@@ -305,6 +304,7 @@ class MyGame(arcade.Window):
             self.is_hold_mouse = False
 
     def on_mouse_scroll(self, x: int, y: int, scroll_x: int, scroll_y: int):
+        """ Change selected pixel when user moves the scroll wheel."""
         if scroll_y == -1 and self.selected_pixel < len(PIXEL_LIST) - 1:
             self.selected_pixel += 1
         if scroll_y == 1 and self.selected_pixel > 0:
