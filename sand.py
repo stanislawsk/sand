@@ -9,7 +9,6 @@ import arcade
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 500
 PIXEL_SIZE = 5
-DRAWING_SPEED = 0.5
 SCREEN_TITLE = "Sand"
 
 
@@ -286,13 +285,11 @@ class MyGame(arcade.Window):
         self.pixel_list = None
         self.pixel_array = None
         self.is_hold_mouse = None
-        self.hold_timer = None
         self.selected_pixel = 0
 
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
         self.is_hold_mouse = False
-        self.hold_timer = DRAWING_SPEED
         self.pixel_list = PixelList()
 
         cols = int(SCREEN_WIDTH / PIXEL_SIZE)
@@ -316,12 +313,10 @@ class MyGame(arcade.Window):
     def on_update(self, delta_time: float):
         """Movement and game logic"""
         self.pixel_list.update()
-        if self.is_hold_mouse and self.hold_timer > DRAWING_SPEED:
+        if self.is_hold_mouse:
             pixel = PIXEL_LIST[self.selected_pixel](self.pixel_array,
                                                     int(self._mouse_x / PIXEL_SIZE), int(self._mouse_y / PIXEL_SIZE), PIXEL_SIZE)
             self.pixel_list.append(pixel)
-            self.hold_timer = 0
-        self.hold_timer += 1
 
     def on_draw(self):
         """Render the screen."""
