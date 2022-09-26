@@ -228,6 +228,18 @@ class SandPixel(Pixel):
             self.move_right()
 
 
+class WaterPixel(Pixel):
+    color = arcade.csscolor.BLUE
+
+    def update(self) -> None:
+        if not self.is_down():
+            self.move_down()
+        elif not self.is_left():
+            self.move_left()
+        elif not self.is_right():
+            self.move_right()
+
+
 class StonePixel(Pixel):
     color = arcade.csscolor.DARK_GREY
 
@@ -237,6 +249,7 @@ class StonePixel(Pixel):
 
 PIXEL_LIST = (
     SandPixel,
+    WaterPixel,
     StonePixel,
 )
 
