@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import ClassVar, Dict, List
+from typing import Dict, List
 
 import arcade
 
@@ -126,12 +126,101 @@ class Pixel(ABC):
         """ Move the pixel to the up by the given distance. """
         self.move(self.x, self.y + distance)
 
+    def is_down(self) -> bool:
+        """ Check if there is any other pixel on the bootom of the pixel.
+
+        Returns:
+            bool: return true if there is a pixel on the bootom.
+        """
+        if self.y > 0 and self.array.get_pixel(self.x, self.y - 1) is None:
+            return False
+        else:
+            return True
+
+    def is_up(self) -> bool:
+        """ Check if there is any other pixel on the up of the pixel.
+
+        Returns:
+            bool: return true if there is a pixel on the up.
+        """
+        if self.y < self.array.rows - 1 and self.array.get_pixel(self.x, self.y + 1) is None:
+            return False
+        else:
+            return True
+
+    def is_right(self) -> bool:
+        """ Check if there is any other pixel on the right of the pixel.
+
+        Returns:
+            bool: return true if there is a pixel on the right.
+        """
+        if self.x < self.array.cols - 1 and self.array.get_pixel(self.x + 1, self.y) is None:
+            return False
+        else:
+            return True
+
+    def is_left(self) -> bool:
+        """ Check if there is any other pixel on the left of the pixel.
+
+        Returns:
+            bool: return true if there is a pixel on the left.
+        """
+        if self.x > 0 and self.array.get_pixel(self.x - 1, self.y) is None:
+            return False
+        else:
+            return True
+
+    def is_down_left(self) -> bool:
+        """ Check if there is any other pixel on the bootom left corner of the pixel.
+
+        Returns:
+            bool: return true if there is a pixel on the bootom left corner.
+        """
+        if self.y > 0 and self.x > 0 and self.array.get_pixel(self.x - 1, self.y - 1) is None:
+            return False
+        else:
+            return True
+
+    def is_down_right(self) -> bool:
+        """ Check if there is any other pixel on the bootom right corner of the pixel.
+
+        Returns:
+            bool: return true if there is a pixel on the bootom right corner.
+        """
+        if self.y > 0 and self.x < self.array.cols - 1 and self.array.get_pixel(self.x + 1, self.y - 1) is None:
+            return False
+        else:
+            return True
+
+    def is_up_left(self) -> bool:
+        """ Check if there is any other pixel on the up left corner of the pixel.
+
+        Returns:
+            bool: return true if there is a pixel on the up left corner.
+        """
+        if self.y < self.array.rows - 1 and self.x > 0 and self.array.get_pixel(self.x - 1, self.y + 1) is None:
+            return False
+        else:
+            return True
+
+    def is_up_right(self) -> bool:
+        """ Check if there is any other pixel on the up right corner of the pixel.
+
+        Returns:
+            bool: return true if there is a pixel on the up right corner.
+        """
+        if self.y < self.array.rows - 1 and self.x < self.array.cols - 1 and self.array.get_pixel(self.x + 1, self.y + 1) is None:
+            return False
+        else:
+            return True
+
 
 class SandPixel(Pixel):
     color = arcade.csscolor.YELLOW
 
     def update(self) -> None:
-        self.move_down(1)
+        if not self.is_up():
+            self.move_up()
 
 
 class MyGame(arcade.Window):
@@ -154,7 +243,9 @@ class MyGame(arcade.Window):
         rows = int(SCREEN_HEIGHT / PIXEL_SIZE)
         self.pixel_array = PixelArray(cols, rows)
 
-        pixel = SandPixel(self.pixel_array, 30, 90, PIXEL_SIZE)
+        pixel = SandPixel(self.pixel_array, cols / 2, 0, PIXEL_SIZE)
+        self.pixel_list.append(pixel)
+        pixel = SandPixel(self.pixel_array, cols / 2, 10, PIXEL_SIZE)
         self.pixel_list.append(pixel)
 
     def on_update(self, delta_time: float):
