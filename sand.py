@@ -9,6 +9,7 @@ import arcade
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 500
 PIXEL_SIZE = 5
+DRAWING_SPEED = 0.5
 SCREEN_TITLE = "Sand"
 
 
@@ -227,6 +228,39 @@ class SandPixel(Pixel):
             self.move_right()
 
 
+class StonePixel(Pixel):
+    color = arcade.csscolor.DARK_GREY
+
+    def update(self) -> None:
+        pass
+
+
+PIXEL_LIST = (
+    SandPixel,
+    StonePixel,
+)
+
+
+def draw_pixel_menu(selected: int, pixels: tuple = PIXEL_LIST,):
+    x = 10
+    y = SCREEN_HEIGHT - 30
+    size = 20
+    selected_pixel = pixels[selected]
+    for pixel in pixels:
+        if pixel is selected_pixel:
+            size = 25
+        else:
+            size = 20
+        arcade.draw_lrtb_rectangle_filled(
+            left=x,
+            right=x + size,
+            top=y + size,
+            bottom=y,
+            color=pixel.color
+        )
+        y -= size + 10
+
+
 class MyGame(arcade.Window):
     """
     Main application class.
@@ -238,31 +272,48 @@ class MyGame(arcade.Window):
 
         self.pixel_list = None
         self.pixel_array = None
-        self.timer = None
+        self.is_hold_mouse = None
+        self.hold_timer = None
+        self.selected_pixel = 0
 
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
+        self.is_hold_mouse = False
+        self.hold_timer = DRAWING_SPEED
         self.pixel_list = PixelList()
 
         cols = int(SCREEN_WIDTH / PIXEL_SIZE)
         rows = int(SCREEN_HEIGHT / PIXEL_SIZE)
         self.pixel_array = PixelArray(cols, rows)
 
-        self.timer = 0
+    def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
+        if button is arcade.MOUSE_BUTTON_LEFT:
+            self.is_hold_mouse = True
+
+    def on_mouse_release(self, x: int, y: int, button: int, modifiers: int):
+        if button is arcade.MOUSE_BUTTON_LEFT:
+            self.is_hold_mouse = False
+
+    def on_mouse_scroll(self, x: int, y: int, scroll_x: int, scroll_y: int):
+        if scroll_y == -1 and self.selected_pixel < len(PIXEL_LIST) - 1:
+            self.selected_pixel += 1
+        if scroll_y == 1 and self.selected_pixel > 0:
+            self.selected_pixel -= 1
 
     def on_update(self, delta_time: float):
         """Movement and game logic"""
         self.pixel_list.update()
-        if self.timer == 20:
-            pixel = SandPixel(self.pixel_array,
-                              self.pixel_array.cols / 2, self.pixel_array.rows - 1, PIXEL_SIZE)
+        if self.is_hold_mouse and self.hold_timer > DRAWING_SPEED:
+            pixel = PIXEL_LIST[self.selected_pixel](self.pixel_array,
+                                                    int(self._mouse_x / PIXEL_SIZE), int(self._mouse_y / PIXEL_SIZE), PIXEL_SIZE)
             self.pixel_list.append(pixel)
-            self.timer = 0
-        self.timer += 1
+            self.hold_timer = 0
+        self.hold_timer += 1
 
     def on_draw(self):
         """Render the screen."""
         self.clear()
+        draw_pixel_menu(self.selected_pixel)
         self.pixel_list.draw()
 
 
