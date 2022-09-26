@@ -59,3 +59,23 @@ class PixelTest(TestCase):
         pixel = Pixel(self.array, 0, 0, 5)
         with self.assertRaises(PixelError):
             pixel.move(20, 30)
+
+    def test_move_right(self):
+        pixel = Pixel(self.array, 0, 0, 5)
+        pixel.move_right(2)
+        self.assertEqual(pixel.x, 2)
+
+    def test_move_left(self):
+        pixel = Pixel(self.array, 5, 0, 5)
+        pixel.move_left(2)
+        self.assertEqual(pixel.x, 3)
+
+    def test_move_down(self):
+        pixel = Pixel(self.array, 0, 5, 5)
+        pixel.move_down(2)
+        self.assertEqual(pixel.y, 3)
+
+    def test_move_up(self):
+        pixel = Pixel(self.array, 0, 0, 5)
+        pixel.move_up(2)
+        self.assertEqual(pixel.y, 2)

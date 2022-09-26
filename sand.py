@@ -81,18 +81,8 @@ class Pixel(ABC):
 
     @abstractmethod
     def update(self) -> None:
+        """ Movement and pixel logic"""
         pass
-
-    def move(self, new_x: int, new_y: int):
-        """ Move pixel to given coordinate
-
-        Args:
-            x (int): destination x coordinate
-            y (int): destination y coordinate
-        """
-        self.array.move(self.x, self.y, new_x, new_y)
-        self.x = new_x
-        self.y = new_y
 
     def draw(self) -> None:
         x = self.x * self.size
@@ -109,12 +99,39 @@ class Pixel(ABC):
     def type(self):
         return self.__class__.__name__
 
+    def move(self, new_x: int, new_y: int) -> None:
+        """ Move pixel to given coordinate
+
+        Args:
+            x (int): destination x coordinate
+            y (int): destination y coordinate
+        """
+        self.array.move(self.x, self.y, new_x, new_y)
+        self.x = new_x
+        self.y = new_y
+
+    def move_right(self, distance: int = 1) -> None:
+        """ Move the pixel to the right by the given distance. """
+        self.move(self.x + distance, self.y)
+
+    def move_left(self, distance: int = 1) -> None:
+        """ Move the pixel to the left by the given distance. """
+        self.move(self.x - distance, self.y)
+
+    def move_down(self, distance: int = 1) -> None:
+        """ Move the pixel to the down by the given distance. """
+        self.move(self.x, self.y - distance)
+
+    def move_up(self, distance: int = 1) -> None:
+        """ Move the pixel to the up by the given distance. """
+        self.move(self.x, self.y + distance)
+
 
 class SandPixel(Pixel):
     color = arcade.csscolor.YELLOW
 
     def update(self) -> None:
-        self.move(self.x, self.y - 1)
+        self.move_down(1)
 
 
 class MyGame(arcade.Window):
@@ -125,7 +142,6 @@ class MyGame(arcade.Window):
     def __init__(self):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
-        self.set_viewport(0, 50, 0, 25)
 
         self.pixel_list = None
         self.pixel_array = None
@@ -133,10 +149,12 @@ class MyGame(arcade.Window):
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
         self.pixel_list = PixelList()
+
         cols = int(SCREEN_WIDTH / PIXEL_SIZE)
         rows = int(SCREEN_HEIGHT / PIXEL_SIZE)
         self.pixel_array = PixelArray(cols, rows)
-        pixel = SandPixel(self.pixel_array, 30, 50, PIXEL_SIZE)
+
+        pixel = SandPixel(self.pixel_array, 30, 90, PIXEL_SIZE)
         self.pixel_list.append(pixel)
 
     def on_update(self, delta_time: float):
