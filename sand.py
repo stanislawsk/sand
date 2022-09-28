@@ -71,7 +71,11 @@ class PixelArray():
 class Pixel(ABC):
     color = arcade.csscolor.GREEN
 
-    def __init__(self, pixel_array: PixelArray, x: int, y: int, size: int = 5) -> None:
+    def __init__(self,
+                 pixel_array: PixelArray,
+                 x: int,
+                 y: int,
+                 size: int = 5) -> None:
         self.x = x
         self.y = y
         self.size = size
@@ -86,13 +90,11 @@ class Pixel(ABC):
     def draw(self) -> None:
         x = self.x * self.size
         y = self.y * self.size
-        arcade.draw_lrtb_rectangle_filled(
-            left=x,
-            right=x + self.size,
-            top=y + self.size,
-            bottom=y,
-            color=self.color
-        )
+        arcade.draw_lrtb_rectangle_filled(left=x,
+                                          right=x + self.size,
+                                          top=y + self.size,
+                                          bottom=y,
+                                          color=self.color)
 
     @property
     def type(self):
@@ -142,7 +144,8 @@ class Pixel(ABC):
         Returns:
             bool: return true if there is a pixel on the up.
         """
-        if self.y < self.array.rows - 1 and self.array.get_pixel(self.x, self.y + 1) is None:
+        if self.y < self.array.rows - 1 and self.array.get_pixel(
+                self.x, self.y + 1) is None:
             return False
         else:
             return True
@@ -153,7 +156,8 @@ class Pixel(ABC):
         Returns:
             bool: return true if there is a pixel on the right.
         """
-        if self.x < self.array.cols - 1 and self.array.get_pixel(self.x + 1, self.y) is None:
+        if self.x < self.array.cols - 1 and self.array.get_pixel(
+                self.x + 1, self.y) is None:
             return False
         else:
             return True
@@ -175,7 +179,8 @@ class Pixel(ABC):
         Returns:
             bool: return true if there is a pixel on the bootom left corner.
         """
-        if self.y > 0 and self.x > 0 and self.array.get_pixel(self.x - 1, self.y - 1) is None:
+        if self.y > 0 and self.x > 0 and self.array.get_pixel(
+                self.x - 1, self.y - 1) is None:
             return False
         else:
             return True
@@ -186,7 +191,8 @@ class Pixel(ABC):
         Returns:
             bool: return true if there is a pixel on the bootom right corner.
         """
-        if self.y > 0 and self.x < self.array.cols - 1 and self.array.get_pixel(self.x + 1, self.y - 1) is None:
+        if self.y > 0 and self.x < self.array.cols - 1 and self.array.get_pixel(
+                self.x + 1, self.y - 1) is None:
             return False
         else:
             return True
@@ -197,7 +203,8 @@ class Pixel(ABC):
         Returns:
             bool: return true if there is a pixel on the up left corner.
         """
-        if self.y < self.array.rows - 1 and self.x > 0 and self.array.get_pixel(self.x - 1, self.y + 1) is None:
+        if self.y < self.array.rows - 1 and self.x > 0 and self.array.get_pixel(
+                self.x - 1, self.y + 1) is None:
             return False
         else:
             return True
@@ -208,7 +215,8 @@ class Pixel(ABC):
         Returns:
             bool: return true if there is a pixel on the up right corner.
         """
-        if self.y < self.array.rows - 1 and self.x < self.array.cols - 1 and self.array.get_pixel(self.x + 1, self.y + 1) is None:
+        if self.y < self.array.rows - 1 and self.x < self.array.cols - 1 and self.array.get_pixel(
+                self.x + 1, self.y + 1) is None:
             return False
         else:
             return True
@@ -232,10 +240,31 @@ class WaterPixel(Pixel):
     def update(self) -> None:
         if not self.is_down():
             self.move_down()
-        elif not self.is_left():
-            self.move_left()
-        elif not self.is_right():
-            self.move_right()
+        else:
+            if self.y > 0:
+
+                buffer_left = 0
+                buffer_right = 0
+                while True:
+                    if buffer_left == -1 and buffer_right == -1:
+                        break
+                    if buffer_left != -1:
+                        if self.array.get_pixel(self.x - buffer_left, self.y - 1) is None:
+                            self.move(self.x - buffer_left, self.y - 1)
+                            break
+                        elif self.array.get_pixel(self.x - buffer_left, self.y - 1).type != 'WaterPixel':
+                            buffer_left = -1
+                        else:
+                            buffer_left += 1
+
+                    if buffer_right != -1:
+                        if self.array.get_pixel(self.x + buffer_right, self.y - 1) is None:
+                            self.move(self.x + buffer_right, self.y - 1)
+                            break
+                        elif self.array.get_pixel(self.x + buffer_right, self.y - 1).type != 'WaterPixel':
+                            buffer_right = -1
+                        else:
+                            buffer_right += 1
 
 
 class StonePixel(Pixel):
@@ -252,7 +281,10 @@ PIXEL_LIST = (
 )
 
 
-def draw_pixel_menu(selected: int, pixels: tuple = PIXEL_LIST,):
+def draw_pixel_menu(
+    selected: int,
+    pixels: tuple = PIXEL_LIST,
+):
     x = 10
     y = SCREEN_HEIGHT - 30
     size = 20
@@ -262,13 +294,11 @@ def draw_pixel_menu(selected: int, pixels: tuple = PIXEL_LIST,):
             size = 25
         else:
             size = 20
-        arcade.draw_lrtb_rectangle_filled(
-            left=x,
-            right=x + size,
-            top=y + size,
-            bottom=y,
-            color=pixel.color
-        )
+        arcade.draw_lrtb_rectangle_filled(left=x,
+                                          right=x + size,
+                                          top=y + size,
+                                          bottom=y,
+                                          color=pixel.color)
         y -= size + 10
 
 
@@ -314,8 +344,9 @@ class MyGame(arcade.Window):
         """Movement and game logic"""
         self.pixel_list.update()
         if self.is_hold_mouse:
-            pixel = PIXEL_LIST[self.selected_pixel](self.pixel_array,
-                                                    int(self._mouse_x / PIXEL_SIZE), int(self._mouse_y / PIXEL_SIZE), PIXEL_SIZE)
+            pixel = PIXEL_LIST[self.selected_pixel](
+                self.pixel_array, int(self._mouse_x / PIXEL_SIZE),
+                int(self._mouse_y / PIXEL_SIZE), PIXEL_SIZE)
             self.pixel_list.append(pixel)
 
     def on_draw(self):
