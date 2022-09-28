@@ -245,11 +245,13 @@ class WaterPixel(Pixel):
 
                 buffer_left = 0
                 buffer_right = 0
-                while True:
+                while buffer_left != -1 and buffer_right != -1:
                     if buffer_left == -1 and buffer_right == -1:
                         break
                     if buffer_left != -1:
-                        if self.array.get_pixel(self.x - buffer_left, self.y - 1) is None:
+                        if self.x - buffer_left == -1:
+                            buffer_left = -1
+                        elif self.array.get_pixel(self.x - buffer_left, self.y - 1) is None:
                             self.move(self.x - buffer_left, self.y - 1)
                             break
                         elif self.array.get_pixel(self.x - buffer_left, self.y - 1).type != 'WaterPixel':
@@ -258,7 +260,9 @@ class WaterPixel(Pixel):
                             buffer_left += 1
 
                     if buffer_right != -1:
-                        if self.array.get_pixel(self.x + buffer_right, self.y - 1) is None:
+                        if self.x + buffer_right == self.array.cols:
+                            buffer_right = -1
+                        elif self.array.get_pixel(self.x + buffer_right, self.y - 1) is None:
                             self.move(self.x + buffer_right, self.y - 1)
                             break
                         elif self.array.get_pixel(self.x + buffer_right, self.y - 1).type != 'WaterPixel':
